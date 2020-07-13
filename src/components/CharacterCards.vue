@@ -8,19 +8,21 @@ export default {
   methods: {
     handleSelection(e) {
       this.$emit("update-selection", e);
-    },
-  },
+    }
+  }
 };
 </script>
 <template>
-  <div class="cardsContainer">
-    <CharacterCard
-      v-for="char of characterList"
-      :key="char.ID"
-      :charInfo="char"
-      @update-selection="handleSelection"
-    />
-  </div>
+  <section>
+    <div class="cardsContainer">
+      <CharacterCard
+        v-for="char of characterList"
+        :key="char.ID"
+        :charInfo="char"
+        @update-selection="handleSelection"
+      />
+    </div>
+  </section>
 </template>
 <style scoped>
 .cardsContainer {

@@ -1,13 +1,14 @@
 <script>
-import crypto from "crypto";
-import moment from "moment";
 import CharacterCards from "./CharacterCards";
+import CharacterInfo from "./CharacterInfo";
 import fullNameList from "../helpers/fullNames.json";
 import { CircleLoader } from "@saeris/vue-spinners";
+// import { getAllCharacters, getCharInfo, getRelated } from "../helpers/api";
+import helperFunctions from "../helpers/api";
 
 export default {
   name: "MainPage",
-  components: { CharacterCards, CircleLoader },
+  components: { CharacterCards, CircleLoader, CharacterInfo },
   data() {
     return {
       name: "", // holds value for name entered in autocomplete search
@@ -17,60 +18,42 @@ export default {
       currentPage: 1,
       length: 26,
       loading: false,
+      showCharInfo: false,
+      selectedCharData: [],
+      related: []
     };
   },
   methods: {
-    getHash() {
-      // creates hash for api call
-      this.timestamp = moment().format("hmmss");
-      let hash = crypto.createHash("md5");
-      hash.setEncoding("hex");
-      let toBeHashed =
-        this.timestamp +
-        process.env.VUE_APP_API_PRIVATE +
-        process.env.VUE_APP_API_PUBLIC;
-      hash.write(toBeHashed);
-      hash.end();
-      this.hash = hash.read();
+    handleBack() {
+      console.log("here");
+      this.showCharInfo = false;
     },
     async getCharacterCards() {
       this.loading = true;
-      this.getHash();
-      let baseUrl = `https://gateway.marvel.com/v1/public/characters?ts=${this.timestamp}&apikey=${process.env.VUE_APP_API_PUBLIC}&hash=${this.hash}&nameStartsWith=${this.alpha}&limit=100`;
-      await fetch(baseUrl)
-        .then((res) => res.json())
-        .then((data) => {
-          let charList = [];
-          for (let character of data.data.results) {
-            let id = character.id;
-            let imageURL = `${character.thumbnail.path}.${character.thumbnail.extension}`;
-            let name = character.name;
-            charList.push({ id, name, imageURL });
-          }
-          this.characterList = charList;
-          this.loading = false;
-        })
-        .catch((error) => console.error(error));
+      await helperFunctions.getAllCharacters(this.alpha).then(data => {
+        this.characterList = data;
+        this.loading = false;
+      });
     },
     async handleSelection(id) {
-      this.getHash();
-      let baseUrl = `https://gateway.marvel.com/v1/public/characters/${id}?ts=${this.timestamp}&apikey=${process.env.VUE_APP_API_PUBLIC}&hash=${this.hash}`;
-      await fetch(baseUrl)
-        .then((res) => res.json())
-        .then((data) => {
-          console.log(data);
-          //   let charList = [];
-          //   for (let character of data.data.results) {
-          //     let id = character.id;
-          //     let imageURL = `${character.thumbnail.path}.${character.thumbnail.extension}`;
-          //     let name = character.name;
-          //     charList.push({ id, name, imageURL });
-          //   }
-          //   this.characterList = charList;
-          //   this.loading = false;
-        })
-        .catch((error) => console.error(error));
-    },
+      //   this.loading = true;
+      await helperFunctions.getCharInfo(id).then(data => {
+        this.selectedCharData = data;
+      });
+      let comicURI = this.selectedCharData.data.results[0].comics.items[0]
+        .resourceURI;
+      await helperFunctions.getRelated(comicURI, id).then(data => {
+        let charList = [];
+        console.log(data);
+        for (let char of data) {
+          let charName = char.name;
+          let charImgURL = `${char.thumbnail.path}.${char.thumbnail.extension}`;
+          charList.push({ charName, charImgURL });
+        }
+        this.related = charList;
+        this.showCharInfo = true;
+      });
+    }
   },
   mounted() {
     this.getCharacterCards();
@@ -82,7 +65,14 @@ export default {
       this.alpha = letter;
       this.getCharacterCards();
     },
-  },
+    name: function() {
+      for (let char of this.characterList) {
+        if (char.name === this.name) {
+          this.handleSelection(char.id);
+        }
+      }
+    }
+  }
 };
 </script>
 <template>
@@ -114,15 +104,14 @@ export default {
           sizeUnit="rem"
           color="darkblue"
         />
-        <div v-bind:class="{ loading: loading }">
-          <CharacterCards
-            @update-selection="handleSelection"
-            :characterList="characterList"
-          />
+        <div v-if="!showCharInfo" v-bind:class="{ loading: loading }">
+          <CharacterCards @update-selection="handleSelection" :characterList="characterList" />
         </div>
-        <div class="paginationContainer">
-          <v-pagination v-model="currentPage" dark :length="length">
-          </v-pagination>
+        <div v-else>
+          <CharacterInfo @handleBack="handleBack" :data="selectedCharData.data" :related="related" />
+        </div>
+        <div v-if="!showCharInfo" class="paginationContainer">
+          <v-pagination v-model="currentPage" dark :length="length"></v-pagination>
         </div>
       </div>
     </main>
@@ -148,7 +137,7 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 1rem;
+  padding: 1.5rem 3rem;
 }
 .paginationContainer {
   width: 30rem;
