@@ -18,6 +18,7 @@ export default new Router({
       path: "/character/:id",
       name: "characterInfo",
       component: CharacterInfo,
+      props: true,
     },
   ],
 });

@@ -15,15 +15,6 @@ const getHash = () => {
   hash = hash.read();
   return { timestamp, hash };
 };
-// const getRelated = async (url) => {
-//   const auth = getHash();
-//   let baseURL = `${url}/characters?ts=${auth.timestamp}&apikey=${process.env.VUE_APP_API_PUBLIC}&hash=${auth.hash}`;
-//   await fetch(baseURL)
-//     .then((res) => res.json())
-//     .then((data) => {
-//       console.log(data);
-//     });
-// };
 
 const helperFunctions = {
   getAllCharacters: async function(alpha) {
@@ -64,7 +55,6 @@ const helperFunctions = {
     await fetch(baseURL)
       .then((res) => res.json())
       .then((data) => {
-        // console.log(data.data.results);
         let charList = [];
         for (let char of data.data.results) {
           if (char.id !== id) {

@@ -6,20 +6,24 @@ Vue.use(Vuex);
 
 const store = new Vuex.Store({
   state: {
-    commentList: {
-      "1017100": [{ id: 1017100, name: "test", comment: "test test test" }],
-    },
+    commentList: [],
   },
   mutations: {
     addNewComment(state, payload) {
+      let id = payload.id.toString();
       let timestamp = moment().format("M/D/YY h:mm A");
       let commentObj = {
-        id: payload.id,
+        id,
         name: payload.name,
         comment: payload.comment,
         timestamp,
       };
-      state.commentList[payload.id].unshift(commentObj);
+
+      if (state.commentList[id]) {
+        state.commentList[payload.id].unshift(commentObj);
+      } else {
+        state.commentList[id] = [commentObj];
+      }
     },
   },
 });

@@ -1,18 +1,16 @@
 <script>
 import CharacterCards from "./CharacterCards";
-import CharacterInfo from "./CharacterInfo";
-import fullNameList from "../helpers/fullNames.json";
+// import CharacterInfo from "./CharacterInfo";
+// import fullNameList from "../helpers/fullNames.json";
 import { CircleLoader } from "@saeris/vue-spinners";
-// import { getAllCharacters, getCharInfo, getRelated } from "../helpers/api";
 import helperFunctions from "../helpers/api";
 
 export default {
   name: "MainPage",
-  components: { CharacterCards, CircleLoader, CharacterInfo },
+  components: { CharacterCards, CircleLoader },
   data() {
     return {
       name: "", // holds value for name entered in autocomplete search
-      nameList: fullNameList, // set helper file to data
       alpha: "A",
       characterList: [],
       currentPage: 1,
@@ -20,40 +18,39 @@ export default {
       loading: false,
       showCharInfo: false,
       selectedCharData: [],
-      related: []
+      related: [],
     };
   },
   methods: {
-    handleBack() {
-      console.log("here");
-      this.showCharInfo = false;
-    },
     async getCharacterCards() {
       this.loading = true;
-      await helperFunctions.getAllCharacters(this.alpha).then(data => {
+      await helperFunctions.getAllCharacters(this.alpha).then((data) => {
         this.characterList = data;
         this.loading = false;
       });
     },
     async handleSelection(id) {
-      //   this.loading = true;
-      await helperFunctions.getCharInfo(id).then(data => {
+      await helperFunctions.getCharInfo(id).then((data) => {
         this.selectedCharData = data;
       });
       let comicURI = this.selectedCharData.data.results[0].comics.items[0]
         .resourceURI;
-      await helperFunctions.getRelated(comicURI, id).then(data => {
+      await helperFunctions.getRelated(comicURI, id).then((data) => {
         let charList = [];
-        console.log(data);
         for (let char of data) {
           let charName = char.name;
           let charImgURL = `${char.thumbnail.path}.${char.thumbnail.extension}`;
           charList.push({ charName, charImgURL });
         }
         this.related = charList;
-        this.showCharInfo = true;
+
+        this.$router.push({
+          name: "characterInfo",
+          params: { id },
+          query: { data: this.selectedCharData.data, related: this.related },
+        });
       });
-    }
+    },
   },
   mounted() {
     this.getCharacterCards();
@@ -71,29 +68,12 @@ export default {
           this.handleSelection(char.id);
         }
       }
-    }
-  }
+    },
+  },
 };
 </script>
 <template>
   <div>
-    <header>
-      <div class="headerContainer">
-        <img class="marvelLogo" src="../assets/marvel-logo.png" alt="Marvel" />
-        <div class="autoComBox">
-          <v-autocomplete
-            dark
-            append-icon="mdi-magnify"
-            v-model="name"
-            label="Search"
-            auto-select-first
-            cache-items
-            clearable
-            :items="nameList"
-          ></v-autocomplete>
-        </div>
-      </div>
-    </header>
     <main>
       <div class="pageContent">
         <h1>All Characters</h1>
@@ -105,34 +85,38 @@ export default {
           color="darkblue"
         />
         <div v-if="!showCharInfo" v-bind:class="{ loading: loading }">
-          <CharacterCards @update-selection="handleSelection" :characterList="characterList" />
-        </div>
-        <div v-else>
-          <CharacterInfo @handleBack="handleBack" :data="selectedCharData.data" :related="related" />
+          <CharacterCards
+            @update-selection="handleSelection"
+            :characterList="characterList"
+          />
         </div>
         <div v-if="!showCharInfo" class="paginationContainer">
-          <v-pagination v-model="currentPage" dark :length="length"></v-pagination>
+          <v-pagination
+            v-model="currentPage"
+            dark
+            :length="length"
+          ></v-pagination>
         </div>
       </div>
     </main>
   </div>
 </template>
 <style scoped>
-.headerContainer {
+/* .headerContainer {
   width: 100%;
   display: flex;
   justify-content: space-between;
   border-bottom: 2px solid black;
   background-color: black;
   padding: 0 1.5rem;
-}
-.marvelLogo {
+} */
+/* .marvelLogo {
   width: 175px;
   height: auto;
-}
-.autoComBox {
+} */
+/* .autoComBox {
   width: 33vw;
-}
+} */
 .pageContent {
   display: flex;
   flex-direction: column;

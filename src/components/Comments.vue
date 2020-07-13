@@ -10,17 +10,14 @@ export default {
       commentBody: "",
       nameError: "",
       commentError: "",
-      allComments: []
+      allComments: [],
     };
   },
   methods: {
     getComments() {
       let commentList = this.getCommentList;
-      let charComments = commentList[this.id];
-      // console.log(charComments);
-
-      if (charComments !== undefined) {
-        this.allComments.push(charComments);
+      if (commentList.length) {
+        this.allComments = commentList[this.id];
       }
     },
     submitComment() {
@@ -35,23 +32,23 @@ export default {
         let payload = {
           id: this.id,
           name: this.commenterName,
-          comment: this.commentBody
+          comment: this.commentBody,
         };
         store.commit("addNewComment", payload);
       }
       this.commenterName = "";
       this.commentBody = "";
       this.getComments();
-    }
+    },
   },
   computed: {
     getCommentList() {
       return store.state.commentList;
-    }
+    },
   },
   mounted() {
     this.getComments();
-  }
+  },
 };
 </script>
 <template>
@@ -60,8 +57,18 @@ export default {
       <h2>Comments</h2>
       <div class="comments">
         <v-form class="commentsForm">
-          <v-text-field outlined v-model="commenterName" label="Your name" required></v-text-field>
-          <v-textarea outlined v-model="commentBody" label="Type your comment here" required></v-textarea>
+          <v-text-field
+            outlined
+            v-model="commenterName"
+            label="Your name"
+            required
+          ></v-text-field>
+          <v-textarea
+            outlined
+            v-model="commentBody"
+            label="Type your comment here"
+            required
+          ></v-textarea>
           <v-btn color="normal" @click="submitComment">Submit</v-btn>
         </v-form>
         <div class="allComments">
@@ -69,10 +76,14 @@ export default {
             <span>No Comments Yet...Add One!</span>
           </div>
           <div v-else>
-            <div class="singleComment" v-for="item of allComments[0]" :key="item.ID">
+            <div
+              class="singleComment"
+              v-for="item of allComments"
+              :key="item.ID"
+            >
               <div class="commentHeader">
                 <span>{{ item.name }}</span>
-                <span>{{item.timestamp}}</span>
+                <span>{{ item.timestamp }}</span>
               </div>
               <v-divider color="white"></v-divider>
               <div>{{ item.comment }}</div>

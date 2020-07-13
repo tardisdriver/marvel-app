@@ -1,22 +1,19 @@
 <script>
-import MainPage from "./components/MainPage";
+import Header from "./components/Header";
 
 export default {
   name: "App",
   components: {
-    MainPage,
+    Header,
   },
-
-  data: () => ({
-    //
-  }),
 };
 </script>
 
 <template>
   <v-app>
     <v-content>
-      <MainPage />
+      <Header />
+      <router-view />
     </v-content>
   </v-app>
 </template>
