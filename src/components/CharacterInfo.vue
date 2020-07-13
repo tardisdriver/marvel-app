@@ -20,75 +20,92 @@ export default {
 </script>
 <template>
   <section>
-    <router-link to="/">
-      <v-btn color="primary"> <v-icon>mdi-arrow-left-thick</v-icon>Back </v-btn>
-    </router-link>
-    <h1>{{ data.results[0].name }}</h1>
-
-    <div class="characterContainer">
-      <div class="charImgWrap">
-        <img
-          class="characterImg"
-          :src="
-            data.results[0].thumbnail.path +
-              '.' +
-              data.results[0].thumbnail.extension
-          "
-          :alt="data.results[0].name"
-        />
-      </div>
-      <div class="characterContent">
-        <h2>Description</h2>
-        <v-divider color="black"></v-divider>
-        <span v-if="data.results[0].description.length">
-          {{ data.results[0].description }}
-        </span>
-        <span v-else>No description available</span>
-        <h2>Series Appearances</h2>
-        <v-divider color="black"></v-divider>
-        <v-list v-bind:class="{ characterList: seriesColumns }">
-          <v-list-item
-            class="listItem"
-            v-for="item in data.results[0].series.items"
-            :key="item.ID"
-            >{{ item.name }}</v-list-item
-          >
-        </v-list>
-        <h2>Notable Events</h2>
-        <v-divider color="black"></v-divider>
-        <v-list
-          v-if="data.results[0].events.items.length"
-          v-bind:class="{ characterList: eventsColumns }"
-        >
-          <v-list-item
-            class="listItem"
-            v-for="item in data.results[0].events.items"
-            :key="item.ID"
-            >{{ item.name }}</v-list-item
-          >
-        </v-list>
-        <span v-else>No event information available</span>
-      </div>
+    <div class="pageHeader">
+      <router-link to="/">
+        <v-btn color="primary">
+          <v-icon>mdi-arrow-left-thick</v-icon>Back
+        </v-btn>
+      </router-link>
+      <h1>{{ data.results[0].name }}</h1>
     </div>
-    <div class="relatedContainer">
-      <h2>Related Characters</h2>
-      <div class="relatedChars">
-        <div v-for="char of related" class="related" :key="char.ID">
-          <div class="relatedItem">
-            <img
-              class="relatedImg"
-              :src="char.charImgURL"
-              :alt="char.charName"
-            />
-            <span>{{ char.charName }}</span>
+    <div class="pageContent">
+      <div class="characterContainer">
+        <div class="charImgWrap">
+          <img
+            class="characterImg"
+            :src="
+              data.results[0].thumbnail.path +
+                '.' +
+                data.results[0].thumbnail.extension
+            "
+            :alt="data.results[0].name"
+          />
+        </div>
+        <div class="characterContent">
+          <h2>Description</h2>
+          <v-divider color="black"></v-divider>
+          <span v-if="data.results[0].description.length">
+            {{ data.results[0].description }}
+          </span>
+          <span v-else>No description available</span>
+          <h2>Series Appearances</h2>
+          <v-divider color="black"></v-divider>
+          <v-list v-bind:class="{ characterList: seriesColumns }">
+            <v-list-item
+              class="listItem"
+              v-for="item in data.results[0].series.items"
+              :key="item.ID"
+              >{{ item.name }}</v-list-item
+            >
+          </v-list>
+          <h2>Notable Events</h2>
+          <v-divider color="black"></v-divider>
+          <v-list
+            v-if="data.results[0].events.items.length"
+            v-bind:class="{ characterList: eventsColumns }"
+          >
+            <v-list-item
+              class="listItem"
+              v-for="item in data.results[0].events.items"
+              :key="item.ID"
+              >{{ item.name }}</v-list-item
+            >
+          </v-list>
+          <span v-else>No event information available</span>
+        </div>
+      </div>
+      <div class="relatedContainer">
+        <h2>Related Characters</h2>
+        <div class="relatedChars">
+          <div v-for="char of related" class="related" :key="char.ID">
+            <div class="relatedItem">
+              <img
+                class="relatedImg"
+                :src="char.charImgURL"
+                :alt="char.charName"
+              />
+              <span>{{ char.charName }}</span>
+            </div>
           </div>
         </div>
       </div>
+      <Comments :id="data.results[0].id" />
     </div>
-    <Comments :id="data.results[0].id" />
   </section>
 </template>
 <style scoped>
+.pageContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1.5rem 3rem;
+}
+.pageHeader {
+  padding: 1rem;
+}
+.pageHeader h1 {
+  margin: 1.5rem 0 0 2rem;
+}
 .circleLoader {
   position: absolute;
   top: 15rem;
@@ -108,6 +125,7 @@ export default {
 }
 .characterImg {
   width: 20rem;
+  max-height: 20rem;
   transform: translate(-10px, 0px);
   clip-path: polygon(0 0, 100% 10%, 100% 88%, 0% 100%);
   border: 1px solid grey;

@@ -102,21 +102,6 @@ export default {
   </div>
 </template>
 <style scoped>
-/* .headerContainer {
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  border-bottom: 2px solid black;
-  background-color: black;
-  padding: 0 1.5rem;
-} */
-/* .marvelLogo {
-  width: 175px;
-  height: auto;
-} */
-/* .autoComBox {
-  width: 33vw;
-} */
 .pageContent {
   display: flex;
   flex-direction: column;
