@@ -16,9 +16,7 @@ export default {
   methods: {
     getComments() {
       let commentList = this.getCommentList;
-      if (commentList.length) {
-        this.allComments = commentList[this.id];
-      }
+      this.allComments = commentList[this.id] || [];
     },
     submitComment() {
       if (!this.commenterName.length || !this.commentBody.length) {
